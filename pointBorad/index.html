@@ -327,32 +327,37 @@
     
         // 创建比赛卡片
         function createMatchCard(match) {
-            return `
-                <div class="match-card">
-                    <div class="league-info">
-                        <img class="league-logo" src="${match.events.image}" alt="${match.events.name}">
-                        <span>${match.events.name}</span>
-                    </div>
-                    <div class="match-time">
-                        ${match.localStartTime}
-                    </div>
-                    <div class="teams-info">
-                        <div class="team">
-                            <img class="team-logo" src="${match.teams[0].image}" alt="${match.teams[0].name}">
-                            <span>${match.teams[0].name}</span>
-                        </div>
-                        <span class="vs">VS</span>
-                        <div class="team">
-                            <img class="team-logo" src="${match.teams[1].image}" alt="${match.teams[1].name}">
-                            <span>${match.teams[1].name}</span>
-                        </div>
-                    </div>
-                    <button class="scoreboard-btn" onclick="openScoreboard('${Date.now()}', '${match.teams[0].name}', '${match.teams[1].name}')">
-                        打开比分版
-                    </button>
+    return `
+        <div class="match-card">
+            <div class="league-info">
+                <img class="league-logo" src="${match.events.image}" alt="${match.events.name}">
+                <span>${match.events.name}</span>
+            </div>
+            <div class="match-time">
+                ${match.localStartTime}
+            </div>
+            <div class="teams-info">
+                <div class="team">
+                    <img class="team-logo" src="${match.teams[0].image}" alt="${match.teams[0].name}">
+                    <span>${match.teams[0].name}</span>
                 </div>
-            `;
-        }
+                <span class="vs">VS</span>
+                <div class="team">
+                    <img class="team-logo" src="${match.teams[1].image}" alt="${match.teams[1].name}">
+                    <span>${match.teams[1].name}</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="scoreboard-btn" onclick="openScoreboard('${Date.now()}', '${match.teams[0].name}', '${match.teams[1].name}')">
+                    比分版1
+                </button>
+                <button class="scoreboard-btn" onclick="openScoreboard2('${Date.now()}', '${match.teams[0].name}', '${match.teams[1].name}')">
+                    比分版2
+                </button>
+            </div>
+        </div>
+    `;
+}
 
         // 打开比分版
         function openScoreboard(id, homeTeam, awayTeam) {
@@ -378,6 +383,36 @@
             // 打开新窗口
             window.open(`scoreboard.html?${params.toString()}`, '_blank');
         }
+       // 打开比分版
+        function openScoreboard2(id, homeTeam, awayTeam) {
+            const matchCard = event.target.closest('.match-card');
+            const matchTime = matchCard.querySelector('.match-time').textContent.trim();
+            
+            // 获取图片元素
+            const leagueLogoElement = matchCard.querySelector('.league-logo');
+            const homeTeamLogoElement = matchCard.querySelector('.team:first-child .team-logo');
+            const awayTeamLogoElement = matchCard.querySelector('.team:last-child .team-logo');
+            
+            // 保存图片数据到本地存储
+            sessionStorage.setItem('leagueLogo', leagueLogoElement.src);
+            sessionStorage.setItem('homeTeamLogo', homeTeamLogoElement.src);
+            sessionStorage.setItem('awayTeamLogo', awayTeamLogoElement.src);
+            
+            // 构建URL参数
+            const params = new URLSearchParams();
+            params.set('homeTeam', homeTeam);
+            params.set('awayTeam', awayTeam);
+            params.set('matchTime', matchTime);
+            
+            // 打开新窗口
+            window.open(`scoreboard2.html?${params.toString()}`, '_blank');
+        }
+
     </script>
+
+
+
+
+
 </body>
 </html>
