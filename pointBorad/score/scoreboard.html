@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比分板</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+        .container {
+            width: 100%;
+            padding: 0;
+        }
+        .scoreboard {
+            display: grid;
+            grid-template-columns: 190px 140px 140px;
+            grid-template-rows: 200px 120px;
+            gap: 0;
+            margin: 0;
+
+            width: 490px;
+            height: 320px;
+            position: relative;
+        }
+        .scoreboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .league-logo {
+            grid-column: 1;
+            grid-row: 1;
+            width: 190px;
+            height: 159px;
+            background-color: #fff;
+            border-right: 1px solid #333;
+            border-bottom: 1px solid #333;
+        }
+        .home-logo {
+            grid-column: 2;
+            grid-row: 1;
+            width: 140px;
+            height: 128px;
+            background-color: #353131;
+            border-right: 1px solid #333;
+            border-bottom: 1px solid #333;
+        }
+        .home-score {
+            grid-column: 3;
+            grid-row: 1;
+            width: 140px;
+            height: 128px;
+            background-color: #fff;
+            border-bottom: 1px solid #333;
+            left: 2px;
+            top: 0.3px;
+
+        }
+        .home-score .score-display {
+            font-size: 95px;
+            font-weight: bold;
+            color: #000;
+            
+
+        }
+
+        .match-time {
+            grid-column: 1;
+            grid-row: 2;
+            width: 190px;
+            height: 97px;
+            background-color: #f00;
+            color: white;
+            border-right: 1px solid #333;
+            top: -40px;
+        }
+        .away-logo {
+            grid-column: 2;
+            grid-row: 2;
+            width: 140px;
+            height: 128px;
+            background-color: #353131;
+            border-right: 1px solid #333;
+            position: absolute;
+            top: -70px;
+            
+        }
+        .away-score {
+            grid-column: 3;
+            grid-row: 2;
+            width: 140px;
+            height: 128px;
+            background-color: #fff;
+            position: absolute;
+            top: -71px;
+            left: 2px;
+        }
+        .away-score .score-display {
+            font-size: 95px;
+            font-weight: bold;
+            color: #000;
+
+        }
+
+        .logo-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-container img {
+            max-width: 77%;
+            max-height: 77%;
+            object-fit: contain;
+            background-color: transparent;
+        }
+        .score-display {
+            font-size: 72px;
+            font-weight: bold;
+            color: #000;
+        }
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+        }
+        #homeTeamName, #awayTeamName {
+            display: none;
+        }
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        .control-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .btn-container {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #FF9800;
+            color: white;
+        }
+        .item-title {
+            display: none;
+        }
+        .timer-input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 80px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="scoreboard">
+            <div class="scoreboard-item league-logo">
+                <div class="logo-container">
+                    <img src="" alt="联赛logo" id="leagueLogo">
+                </div>
+            </div>
+            
+            <div class="scoreboard-item home-logo">
+                <div class="logo-container">
+                    <img src="" alt="主队logo" id="homeLogoImg">
+                </div>
+                <div id="homeTeamName"></div>
+            </div>
+            
+            <div class="scoreboard-item home-score">
+                <div class="score-display" id="homeScore">0</div>
+            </div>
+            
+            <div class="scoreboard-item match-time">
+                <div class="timer-display" id="timer">00:00</div>
+            </div>
+            
+            <div class="scoreboard-item away-logo">
+                <div class="logo-container">
+                    <img src="" alt="客队logo" id="awayLogoImg">
+                </div>
+                <div id="awayTeamName"></div>
+            </div>
+            
+            <div class="scoreboard-item away-score">
+                <div class="score-display" id="awayScore">0</div>
+            </div>
+        </div>
+        
+        <div class="controls-container">
+            <div class="control-group">
+                <div class="control-title">计时器控制</div>
+                <input type="text" id="customTime" class="timer-input" placeholder="例如: 48:51" />
+                <div class="btn-container">
+                    <button class="btn btn-primary" id="setCustomTime">
+                        <span>设置时间</span>
+                    </button>
+                    <button class="btn btn-primary" id="startTimer">
+                        <span>开始计时</span>
+                    </button>
+                    <button class="btn btn-warning" id="pauseTimer">
+                        <span>暂停计时</span>
+                    </button>
+                    <button class="btn btn-danger" id="resetTimer">
+                        <span>重置计时</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title">主队比分控制</div>
+                <div class="btn-container">
+                    <button class="btn btn-success" onclick="updateScore('home', 1)">
+                        <span>增加主队比分</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="updateScore('home', -1)">
+                        <span>减少主队比分</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title">客队比分控制</div>
+                <div class="btn-container">
+                    <button class="btn btn-success" onclick="updateScore('away', 1)">
+                        <span>增加客队比分</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="updateScore('away', -1)">
+                        <span>减少客队比分</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let seconds = 0;
+        let isRunning = false;
+
+        function updateTimer() {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            // 当计时器达到45:00时自动暂停
+            if (minutes == 45 && remainingSeconds === 0 && isRunning) {
+                isRunning = false;
+                clearInterval(timerInterval);
+            }
+        }
+
+        document.getElementById('startTimer').onclick = function() {
+            if (!isRunning) {
+                isRunning = true;
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    updateTimer();
+                }, 1000);
+            }
+        };
+
+        document.getElementById('pauseTimer').onclick = function() {
+            isRunning = false;
+            clearInterval(timerInterval);
+        };
+
+        document.getElementById('resetTimer').onclick = function() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            seconds = 0;
+            updateTimer();
+        };
+
+        document.getElementById('setCustomTime').onclick = function() {
+            const customTimeInput = document.getElementById('customTime').value;
+            if (customTimeInput) {
+                // 解析输入的时间格式 (MM:SS)
+                const timeParts = customTimeInput.split(':');
+                if (timeParts.length === 2) {
+                    const minutes = parseInt(timeParts[0], 10);
+                    const secs = parseInt(timeParts[1], 10);
+                    
+                    if (!isNaN(minutes) && !isNaN(secs) && minutes >= 0 && secs >= 0 && secs < 60) {
+                        // 停止当前计时器
+                        isRunning = false;
+                        clearInterval(timerInterval);
+                        
+                        // 设置新的时间
+                        seconds = minutes * 60 + secs;
+                        updateTimer();
+                    } else {
+                        alert('请输入有效的时间格式 (分钟:秒钟)');
+                    }
+                } else {
+                    alert('请按照 MM:SS 格式输入时间');
+                }
+            }
+        };
+
+        function updateScore(team, change) {
+            const scoreElement = document.getElementById(`${team}Score`);
+            let score = parseInt(scoreElement.textContent) + change;
+            score = Math.max(0, score); // 确保分数不小于0
+            scoreElement.textContent = score;
+        }
+
+        // 初始化
+        window.onload = function() {
+            try {
+                // 获取URL参数
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                // 设置队名
+                const homeTeam = urlParams.get('homeTeam') || '';
+                const awayTeam = urlParams.get('awayTeam') || '';
+                document.getElementById('homeTeamName').textContent = homeTeam;
+                document.getElementById('awayTeamName').textContent = awayTeam;
+                
+                // 始终将计时器设置为00:00
+                document.getElementById('timer').textContent = '00:00';
+                seconds = 0;
+                
+                // 从 sessionStorage 获取图片 URL
+                const leagueLogo = sessionStorage.getItem('leagueLogo');
+                const homeTeamLogo = sessionStorage.getItem('homeTeamLogo');
+                const awayTeamLogo = sessionStorage.getItem('awayTeamLogo');
+                
+                console.log("获取到的图片URL:", {
+                    leagueLogo,
+                    homeTeamLogo,
+                    awayTeamLogo
+                });
+                
+                // 设置图片
+                document.getElementById('leagueLogo').src = leagueLogo || '';
+                document.getElementById('homeLogoImg').src = homeTeamLogo || '';
+                document.getElementById('awayLogoImg').src = awayTeamLogo || '';
+                
+            } catch (error) {
+                console.error('Error loading match data:', error);
+            }
+        };
+    </script>
+</body>
+</html>

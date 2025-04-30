@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>足球比赛列表</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .add-match-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            padding: 25px 40px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .match-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            gap: 15px;
+            background-color: white;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .league-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 120px;
+        }
+        .league-logo {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+        .team-logo {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+        .teams-info {
+            display: flex;
+            align-items: center;
+            gap: 1px;
+            flex: 1;
+        }
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .vs {
+            margin: 0 20px;
+            font-weight: bold;
+        }
+        .match-time {
+            min-width: 100px;
+            text-align: center;
+        }
+        .scoreboard-btn {
+            padding: 8px 1px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 10px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .team-logo-upload {
+            border: 2px dashed #ddd;
+            padding: 10px;
+            text-align: center;
+            margin-top: 6px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .team-logo-upload:hover {
+            border-color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        .team-logo-preview {
+            max-width: 42px;
+            max-height: 42px;
+            display: none;
+            margin: 5px auto;
+        }
+        .btn {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 0;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="matchList">
+        <!-- 比赛列表将通过 JavaScript 动态生成 -->
+        <div id="emptyState" class="empty-state">
+            <h2>暂无比赛</h2>
+            <p>点击右下角按钮添加新比赛</p>
+        </div>
+    </div>
+
+    <!-- 添加比赛按钮 -->
+    <button class="add-match-btn" onclick="openAddMatchModal()">添加比赛</button>
+
+    <!-- 添加比赛的模态框 -->
+    <div id="addMatchModal" class="modal">
+        <div class="modal-content">
+            <h2>添加新比赛</h2>
+            <form id="addMatchForm">
+                <div class="form-group">
+                    <label>联赛名称</label>
+                    <input type="text" id="leagueName" placeholder="请输入联赛名称">
+                    <div class="team-logo-upload" id="leagueLogoUpload">
+                        <span>点击或拖放上传联赛logo</span>
+                        <img id="leagueLogoPreview" class="team-logo-preview">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>比赛时间</label>
+                    <input type="text" id="matchTime" placeholder="请输入比赛时间" required>
+                </div>
+                <div class="form-group">
+                    <label>主队名称</label>
+                    <input type="text" id="homeTeamName" required>
+                    <div class="team-logo-upload" id="homeTeamLogoUpload">
+                        <span>点击或拖放上传主队logo</span>
+                        <img id="homeTeamLogoPreview" class="team-logo-preview">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>客队名称</label>
+                    <input type="text" id="awayTeamName" required>
+                    <div class="team-logo-upload" id="awayTeamLogoUpload">
+                        <span>点击或拖放上传客队logo</span>
+                        <img id="awayTeamLogoPreview" class="team-logo-preview">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddMatchModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 检查是否有比赛
+        function checkEmptyState() {
+            const matchCards = document.querySelectorAll('.match-card');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (matchCards.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // 页面加载时检查
+        window.onload = function() {
+            checkEmptyState();
+        };
+
+        // 模态框操作
+        function openAddMatchModal() {
+            document.getElementById('addMatchModal').style.display = 'block';
+        }
+
+        function closeAddMatchModal() {
+            document.getElementById('addMatchModal').style.display = 'none';
+            document.getElementById('addMatchForm').reset();
+            document.getElementById('homeTeamLogoPreview').style.display = 'none';
+            document.getElementById('awayTeamLogoPreview').style.display = 'none';
+            document.getElementById('leagueLogoPreview').style.display = 'none';
+        }
+
+        // 处理图片上传
+        function setupImageUpload(uploadId, previewId) {
+            const uploadDiv = document.getElementById(uploadId);
+            const preview = document.getElementById(previewId);
+
+            uploadDiv.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadDiv.style.borderColor = '#4CAF50';
+                uploadDiv.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+            });
+
+            uploadDiv.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadDiv.style.borderColor = '#ddd';
+                uploadDiv.style.backgroundColor = '';
+            });
+
+            uploadDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadDiv.style.borderColor = '#ddd';
+                uploadDiv.style.backgroundColor = '';
+                handleImageFile(e.dataTransfer.files[0], preview);
+            });
+
+            uploadDiv.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => handleImageFile(e.target.files[0], preview);
+                input.click();
+            });
+        }
+
+        function handleImageFile(file, preview) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 初始化所有图片上传区域
+        setupImageUpload('leagueLogoUpload', 'leagueLogoPreview');
+        setupImageUpload('homeTeamLogoUpload', 'homeTeamLogoPreview');
+        setupImageUpload('awayTeamLogoUpload', 'awayTeamLogoPreview');
+
+        // 处理表单提交
+        document.getElementById('addMatchForm').onsubmit = function(e) {
+            e.preventDefault();
+            const defaultLogo = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIi8+PC9zdmc+';
+            
+            const leagueLogoPreview = document.getElementById('leagueLogoPreview');
+            const homeTeamLogoPreview = document.getElementById('homeTeamLogoPreview');
+            const awayTeamLogoPreview = document.getElementById('awayTeamLogoPreview');
+            
+            const newMatch = {
+                events: {
+                    name: document.getElementById('leagueName').value || '未知联赛',
+                    image: leagueLogoPreview.style.display === 'block' ? leagueLogoPreview.src : defaultLogo
+                },
+                localStartTime: document.getElementById('matchTime').value,
+                teams: [
+                    {
+                        name: document.getElementById('homeTeamName').value,
+                        image: homeTeamLogoPreview.style.display === 'block' ? homeTeamLogoPreview.src : defaultLogo
+                    },
+                    {
+                        name: document.getElementById('awayTeamName').value,
+                        image: awayTeamLogoPreview.style.display === 'block' ? awayTeamLogoPreview.src : defaultLogo
+                    }
+                ]
+            };
+    
+            const matchCard = createMatchCard(newMatch);
+            document.getElementById('matchList').insertAdjacentHTML('afterbegin', matchCard);
+            closeAddMatchModal();
+            checkEmptyState(); // 更新空状态显示
+        };
+    
+        // 创建比赛卡片
+        function createMatchCard(match) {
+    return `
+        <div class="match-card">
+            <div class="league-info">
+                <img class="league-logo" src="${match.events.image}" alt="${match.events.name}">
+                <span>${match.events.name}</span>
+            </div>
+            <div class="match-time">
+                ${match.localStartTime}
+            </div>
+            <div class="teams-info">
+                <div class="team">
+                    <img class="team-logo" src="${match.teams[0].image}" alt="${match.teams[0].name}">
+                    <span>${match.teams[0].name}</span>
+                </div>
+                <span class="vs">VS</span>
+                <div class="team">
+                    <img class="team-logo" src="${match.teams[1].image}" alt="${match.teams[1].name}">
+                    <span>${match.teams[1].name}</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="scoreboard-btn" onclick="openScoreboard('${Date.now()}', '${match.teams[0].name}', '${match.teams[1].name}')">
+                    比分版1
+                </button>
+                <button class="scoreboard-btn" onclick="openScoreboard2('${Date.now()}', '${match.teams[0].name}', '${match.teams[1].name}')">
+                    比分版2
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+        // 打开比分版
+        function openScoreboard(id, homeTeam, awayTeam) {
+            const matchCard = event.target.closest('.match-card');
+            const matchTime = matchCard.querySelector('.match-time').textContent.trim();
+            
+            // 获取图片元素
+            const leagueLogoElement = matchCard.querySelector('.league-logo');
+            const homeTeamLogoElement = matchCard.querySelector('.team:first-child .team-logo');
+            const awayTeamLogoElement = matchCard.querySelector('.team:last-child .team-logo');
+            
+            // 保存图片数据到本地存储
+            sessionStorage.setItem('leagueLogo', leagueLogoElement.src);
+            sessionStorage.setItem('homeTeamLogo', homeTeamLogoElement.src);
+            sessionStorage.setItem('awayTeamLogo', awayTeamLogoElement.src);
+            
+            // 构建URL参数
+            const params = new URLSearchParams();
+            params.set('homeTeam', homeTeam);
+            params.set('awayTeam', awayTeam);
+            params.set('matchTime', matchTime);
+            
+            // 打开新窗口
+            window.open(`score/scoreboard.html?${params.toString()}`, '_blank');
+        }
+       // 打开比分版
+        function openScoreboard2(id, homeTeam, awayTeam) {
+            const matchCard = event.target.closest('.match-card');
+            const matchTime = matchCard.querySelector('.match-time').textContent.trim();
+            
+            // 获取图片元素
+            const leagueLogoElement = matchCard.querySelector('.league-logo');
+            const homeTeamLogoElement = matchCard.querySelector('.team:first-child .team-logo');
+            const awayTeamLogoElement = matchCard.querySelector('.team:last-child .team-logo');
+            
+            // 保存图片数据到本地存储
+            sessionStorage.setItem('leagueLogo', leagueLogoElement.src);
+            sessionStorage.setItem('homeTeamLogo', homeTeamLogoElement.src);
+            sessionStorage.setItem('awayTeamLogo', awayTeamLogoElement.src);
+            
+            // 构建URL参数
+            const params = new URLSearchParams();
+            params.set('homeTeam', homeTeam);
+            params.set('awayTeam', awayTeam);
+            params.set('matchTime', matchTime);
+            
+            // 打开新窗口
+            window.open(`score/scoreboard2.html?${params.toString()}`, '_blank');
+        }
+
+    </script>
+
+
+
+
+
+</body>
+</html>
