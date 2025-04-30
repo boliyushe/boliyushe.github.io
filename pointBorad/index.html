@@ -18,9 +18,9 @@
         }
         .add-match-btn {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 15px 30px;
+            bottom: 40px;
+            right: 40px;
+            padding: 25px 40px;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -33,51 +33,51 @@
         .match-card {
             display: flex;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             border-bottom: 1px solid #ddd;
-            gap: 30px;
+            gap: 15px;
             background-color: white;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .league-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            min-width: 150px;
+            gap: 5px;
+            min-width: 120px;
         }
         .league-logo {
-            width: 40px;
-            height: 40px;
+            width: 20px;
+            height: 20px;
             object-fit: contain;
         }
         .team-logo {
-            width: 50px;
-            height: 50px;
+            width: 20px;
+            height: 20px;
             object-fit: contain;
         }
         .teams-info {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 1px;
             flex: 1;
         }
         .team {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
         }
         .vs {
             margin: 0 20px;
             font-weight: bold;
         }
         .match-time {
-            min-width: 120px;
+            min-width: 100px;
             text-align: center;
         }
         .scoreboard-btn {
-            padding: 8px 15px;
+            padding: 8px 1px;
             background-color: #2196F3;
             color: white;
             border: none;
@@ -97,14 +97,14 @@
         .modal-content {
             background-color: white;
             margin: 50px auto;
-            padding: 20px;
+            padding: 10px;
             width: 80%;
             max-width: 600px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .form-group label {
             display: block;
@@ -120,9 +120,9 @@
         }
         .team-logo-upload {
             border: 2px dashed #ddd;
-            padding: 20px;
+            padding: 10px;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 6px;
             cursor: pointer;
             border-radius: 4px;
         }
@@ -131,17 +131,17 @@
             background-color: rgba(76, 175, 80, 0.05);
         }
         .team-logo-preview {
-            max-width: 100px;
-            max-height: 100px;
+            max-width: 42px;
+            max-height: 42px;
             display: none;
-            margin: 10px auto;
+            margin: 5px auto;
         }
         .btn {
-            padding: 10px 15px;
+            padding: 8px 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             margin-right: 10px;
         }
         .btn-primary {
@@ -381,7 +381,7 @@
             params.set('matchTime', matchTime);
             
             // 打开新窗口
-            window.open(`scoreboard.html?${params.toString()}`, '_blank');
+            window.open(`score/scoreboard.html?${params.toString()}`, '_blank');
         }
        // 打开比分版
         function openScoreboard2(id, homeTeam, awayTeam) {
@@ -405,7 +405,7 @@
             params.set('matchTime', matchTime);
             
             // 打开新窗口
-            window.open(`scoreboard2.html?${params.toString()}`, '_blank');
+            window.open(`score/scoreboard2.html?${params.toString()}`, '_blank');
         }
 
     </script>
